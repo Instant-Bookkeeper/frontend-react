@@ -83,8 +83,6 @@ export const PurchasesTab: React.FC<{
     return { totalAmt, totalOrdered, totalReceived, balance };
   }, [filteredBills, paymentApps]);
 
-  console.log(pos);
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
