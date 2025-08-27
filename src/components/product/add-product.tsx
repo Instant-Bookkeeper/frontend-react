@@ -34,21 +34,21 @@ export const AddProduct: React.FC<{
   onOpenExisting,
 }) => {
   const [draft, setDraft] = useState<Product>({
-    product_id: uid("P"),
-    product_name: "",
-    image_url: "",
-    brand: "",
-    category: "",
+    id: uid("P"),
+    productName: "",
+
+    brandName: "",
+    categoryName: "",
     skus: [],
     asins: [],
     upcs: [],
-    total_sold: 0,
-    total_profit: 0,
+    totalSold: 0,
+    totalProfit: 0,
   });
   React.useEffect(() => {
     if (open) setDraft((d) => ({ ...d, skus: presetSKU ? [presetSKU] : [] }));
   }, [open, presetSKU]);
-  const canSave = draft.product_name.trim().length > 0;
+  const canSave = draft.productName.trim().length > 0;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">

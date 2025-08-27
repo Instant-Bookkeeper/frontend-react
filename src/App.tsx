@@ -5,18 +5,25 @@ import Login from "./routes/login";
 import ProductsPage from "./routes/products";
 import Register from "./routes/register";
 import ProfilePage from "./routes/profile";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { refetchOnWindowFocus: false } },
+});
 
 function App() {
   return (
-    <Routes>
-      <Route index element={<Navigate to={"/app/products"} replace />} />
-      <Route path="/app" element={<Home />}>
-        <Route path="products" element={<ProductsPage />} />
-        <Route path="profile" element={<ProfilePage />} />
-      </Route>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-    </Routes>
+    <QueryClientProvider client={queryClient}>
+      <Routes>
+        <Route index element={<Navigate to={"/app/products"} replace />} />
+        <Route path="/app" element={<Home />}>
+          <Route path="products" element={<ProductsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </QueryClientProvider>
   );
 }
 

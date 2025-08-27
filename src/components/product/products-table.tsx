@@ -52,8 +52,8 @@ export const ProductsTable: React.FC<{
           </TableHeader>
           <TableBody>
             {products.map((p) => (
-              <TableRow key={p.product_id}>
-                <TableCell className="">{p.product_name}</TableCell>
+              <TableRow key={p.id}>
+                <TableCell className="">{p.productName}</TableCell>
                 <TableCell className="">
                   <CompactTags list={p.skus} variant="secondary" />
                 </TableCell>
@@ -63,13 +63,13 @@ export const ProductsTable: React.FC<{
                 <TableCell className="">
                   <CompactTags list={p.upcs} />
                 </TableCell>
-                <TableCell>{p.brand || "—"}</TableCell>
-                <TableCell>{p.category || "—"}</TableCell>
+                <TableCell>{p.brandName || "—"}</TableCell>
+                <TableCell>{p.categoryName || "—"}</TableCell>
                 <TableCell className="text-right">
-                  {p.total_sold ?? "—"}
+                  {p.totalSold ?? "—"}
                 </TableCell>
                 <TableCell className="text-right">
-                  ${currency(p.total_profit)}
+                  ${currency(p.totalProfit)}
                 </TableCell>
                 <TableCell className="text-center w-[124px] ">
                   <Button

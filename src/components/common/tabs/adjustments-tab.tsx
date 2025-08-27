@@ -62,8 +62,8 @@ export const AdjustmentsTab: React.FC<{
               </SelectTrigger>
               <SelectContent>
                 {products.map((p) => (
-                  <SelectItem key={p.product_id} value={p.product_id}>
-                    {p.product_name}
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.productName}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -77,13 +77,13 @@ export const AdjustmentsTab: React.FC<{
                 <SelectValue placeholder="Select SKU" />
               </SelectTrigger>
               <SelectContent>
-                {(
-                  products.find((p) => p.product_id === productId)?.skus || []
-                ).map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
-                ))}
+                {(products.find((p) => p.id === productId)?.skus || []).map(
+                  (s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  )
+                )}
               </SelectContent>
             </Select>
           </div>

@@ -40,7 +40,7 @@ import {
   ShoppingCart,
   SplitSquareHorizontal,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PurchasesTab } from "../tabs/purchases-tab";
 import { PaymentsTab } from "../tabs/payments-tab";
 import { RemovalsTab } from "../tabs/removals-tab";
@@ -48,9 +48,10 @@ import { FBATab } from "../tabs/fba-tab";
 import { AdjustmentsTab } from "../tabs/adjustments-tab";
 import { TasksTab } from "../tabs/tasks-tab";
 import { ProductsTab } from "../tabs/products-tab";
-import { Link, Outlet } from "react-router";
+import { Link, Outlet, useNavigate } from "react-router";
 import clsx from "clsx";
 import Header from "./header";
+import { getUserProfile, type UserProfile } from "@/services/user.service";
 type TabType =
   | "purchases"
   | "products"
@@ -73,8 +74,12 @@ const links = [
   },
   { key: "tasks", label: "Tasks", icon: ClipboardList },
 ];
+
 export default function AppCanvas() {
-  const [products] = useState<Product[]>(MOCK_PRODUCTS);
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<UserProfile | null>(null);
+
   const [pos, setPOs] = useState<PORow[]>(MOCK_POS);
   const [bills, setBills] = useState<BillRow[]>(MOCK_BILLS);
   const [billItems] = useState<BillItem[]>(MOCK_BILL_ITEMS);
@@ -89,9 +94,40 @@ export default function AppCanvas() {
 
   const [tab, setTab] = useState<TabType>("products");
 
+  const fetchUserProfile = async () => {
+    try {
+      const res = await getUserProfile();
+      setUser(res);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchUserProfile();
+    } else {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
+
+  if (isLoading)
+    return (
+      <div className="h-screen w-screen overflow-hidden flex items-center justify-center">
+        <h2 className="text-3xl font-semibold text-muted-foreground animate-pulse">
+          Loading...
+        </h2>
+      </div>
+    );
+
+  if (!user) return null;
+
   return (
     <>
-      <Header />
+      <Header user={user} />
       <div className="mx-auto max-w-7xl p-4 md:p-8 space-y-6">
         {/* Header */}
         {/* <div className="flex items-center justify-between gap-4">
@@ -158,7 +194,7 @@ export default function AppCanvas() {
             />
           )} */}
 
-            <Outlet />
+            <Outlet context={{ user }} />
 
             {/* {tab === "products" && <ProductsTab products={products} />} */}
 

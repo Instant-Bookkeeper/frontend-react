@@ -9,6 +9,9 @@ export default tseslint.config([
   globalIgnores(["dist"]),
   {
     files: ["**/*.{ts,tsx}"],
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+    },
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
@@ -19,10 +22,9 @@ export default tseslint.config([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-  },
-  {
     rules: {
       "@typescript-eslint/no-unused-vars": "warn",
+      "react-refresh/only-export-components": "off",
     },
   },
 ]);

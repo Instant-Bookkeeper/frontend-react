@@ -2,7 +2,7 @@ import { axiosInstance } from "@/lib/axios-instance";
 
 // ====================== Types ======================
 
-type UserProfile = {
+export type UserProfile = {
   name: string;
   email: string;
   role: string;
@@ -10,5 +10,5 @@ type UserProfile = {
 
 // ====================== API Calls ======================
 
-export const userProfile = (): Promise<UserProfile> =>
+export const getUserProfile = (): Promise<UserProfile> =>
   axiosInstance.get(`/users/profile`);

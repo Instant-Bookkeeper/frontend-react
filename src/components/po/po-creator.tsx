@@ -100,12 +100,12 @@ export const POCreator: React.FC<{
 p-3"
                 >
                   <div className="col-span-6">
-                    <ProductPicker
+                    {/* <ProductPicker
                       products={products}
                       value={{ product_id: ln.product_id, sku: ln.sku }}
                       onChange={(v) => updateLine(i, v)}
                       allowCreate
-                    />
+                    /> */}
                   </div>
                   <div className="col-span-2">
                     <Label>Qty</Label>
