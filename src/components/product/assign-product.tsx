@@ -23,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import React, { useState } from "react";
-import { CatalogSKU, Product } from "./types";
+import type { CatalogSKU, Product } from "./types";
 import { ProductCombobox } from "./product-search";
 
 export const AssignProductsModal: React.FC<{

@@ -18,7 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import React, { useState } from "react";
-import { Product } from "./types";
+import type { Product } from "./types";
 
 export const ProductCombobox: React.FC<{
   products: Product[];

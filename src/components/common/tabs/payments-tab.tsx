@@ -1,6 +1,6 @@
 import { ApplyPaymentModal } from "@/components/billing/apply-payment";
 import { Money } from "@/components/billing/money";
-import { BillRow, PaymentApp, PaymentRow } from "@/components/billing/types";
+import type { BillRow, PaymentApp, PaymentRow } from "@/components/billing/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {

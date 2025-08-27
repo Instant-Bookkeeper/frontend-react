@@ -1,16 +1,15 @@
-import {
+import type {
   Adjustment,
+  BillItem,
+  BillRow,
   PaymentApp,
   PaymentRow,
+  PORow,
+  Product,
   RemovalRow,
   Shipment,
   ShipmentItem,
-  Task,
-  Product,
-  POItem,
-  PORow,
-  BillItem,
-  BillRow,
+  Task
 } from "./types";
 
 export const MOCK_PRODUCTS: Product[] = [

@@ -1,5 +1,5 @@
-import { Adjustment } from "@/components/billing/types";
-import { Product } from "@/components/product/types";
+import type { Adjustment } from "@/components/billing/types";
+import type { Product } from "@/components/product/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

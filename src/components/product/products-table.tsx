@@ -15,9 +15,10 @@ import {
 } from "@/components/ui/table";
 import { Boxes } from "lucide-react";
 import React from "react";
-import { Product } from "./types";
+import type { Product } from "./types";
 import { CompactTags } from "../common/compact-tags";
 import { currency } from "@/lib/utils";
+import { Scrollbar } from "@radix-ui/react-scroll-area";
 
 export const ProductsTable: React.FC<{
   products: Product[];
@@ -29,9 +30,9 @@ export const ProductsTable: React.FC<{
         <Boxes className="size-4" /> Products
       </CardTitle>
     </CardHeader>
-    <CardContent className="p-0">
-      <ScrollArea className="max-h-[65vh]">
-        <Table className="table-fixed w-full">
+    <CardContent className="">
+      <div className="border rounded-xl">
+        <Table className=" w-full">
           <TableHeader>
             <TableRow className="">
               <TableHead className="min-w-[260px] w-[380px]">
@@ -44,7 +45,7 @@ export const ProductsTable: React.FC<{
               <TableHead>Category</TableHead>
               <TableHead className="text-right">Total Sold</TableHead>
               <TableHead className="text-right">Total Profit</TableHead>
-              <TableHead className="text-center w-[124px] whitespace-nowrap">
+              <TableHead className="text-center w-[124px] ">
                 View/Edit
               </TableHead>
             </TableRow>
@@ -52,16 +53,14 @@ export const ProductsTable: React.FC<{
           <TableBody>
             {products.map((p) => (
               <TableRow key={p.product_id}>
-                <TableCell className="whitespace-nowrap overflow-hidden">
-                  {p.product_name}
-                </TableCell>
-                <TableCell className="whitespace-nowrap overflow-hidden">
+                <TableCell className="">{p.product_name}</TableCell>
+                <TableCell className="">
                   <CompactTags list={p.skus} variant="secondary" />
                 </TableCell>
-                <TableCell className="whitespace-nowrap overflow-hidden">
+                <TableCell className="">
                   <CompactTags list={p.asins} />
                 </TableCell>
-                <TableCell className="whitespace-nowrap overflow-hidden">
+                <TableCell className="">
                   <CompactTags list={p.upcs} />
                 </TableCell>
                 <TableCell>{p.brand || "—"}</TableCell>
@@ -72,7 +71,7 @@ export const ProductsTable: React.FC<{
                 <TableCell className="text-right">
                   ${currency(p.total_profit)}
                 </TableCell>
-                <TableCell className="text-center w-[124px] whitespace-nowrap">
+                <TableCell className="text-center w-[124px] ">
                   <Button
                     size="sm"
                     variant="ghost"
@@ -86,7 +85,7 @@ export const ProductsTable: React.FC<{
             ))}
           </TableBody>
         </Table>
-      </ScrollArea>
+      </div>
     </CardContent>
   </Card>
 );

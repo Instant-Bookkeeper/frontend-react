@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Attachment, BillItem, BillRow, PORow } from "./types";
+import type { Attachment, BillItem, BillRow, PORow } from "./types";
 import { fmtMoney, today } from "@/lib/utils";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";

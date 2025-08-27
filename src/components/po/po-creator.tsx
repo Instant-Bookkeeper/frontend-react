@@ -19,7 +19,7 @@ import { ShoppingCart } from "lucide-react";
 import React, { useState } from "react";
 import { ProductPicker } from "../product/product-picker";
 import { CurrencyAmount } from "../billing/currency-amount";
-import { PORow, Product } from "../billing/types";
+import type { PORow, Product } from "../billing/types";
 import { ScrollArea } from "../ui/scroll-area";
 
 export const POCreator: React.FC<{

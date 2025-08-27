@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
-import { BillItem } from "./types";
+import type { BillItem } from "./types";
 
 export const SplitItemDialog: React.FC<{
   item?: BillItem | null;

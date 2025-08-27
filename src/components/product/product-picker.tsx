@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import React, { useState } from "react";
 import { v4 as uuid } from "uuid";
-import { Product } from "./types";
+import type { Product } from "./types";
 export const ProductPicker: React.FC<{
   products: Product[];
   value?: { product_id?: string; sku?: string };

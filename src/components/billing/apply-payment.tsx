@@ -20,7 +20,7 @@ import {
 import { ArrowLeftRight } from "lucide-react";
 import React, { useState } from "react";
 import { Money } from "./money";
-import { BillRow, PaymentApp, PaymentRow } from "./types";
+import type { BillRow, PaymentApp, PaymentRow } from "./types";
 
 export const ApplyPaymentModal: React.FC<{
   open: boolean;

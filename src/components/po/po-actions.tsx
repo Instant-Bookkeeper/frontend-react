@@ -3,7 +3,7 @@ import { AttachmentUploader } from "../common/attachment-uploader";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
-import { Attachment, BillRow, PORow, ShipmentRow } from "./types";
+import type { Attachment, BillRow, PORow, ShipmentRow } from "./types";
 import { EmailDialog } from "../common/email-composer";
 import { CreateShipmentDialog } from "./create-shipment";
 import { ConvertToBillDialog } from "./convert-to-billing";

@@ -1,4 +1,4 @@
-import { Task } from "@/components/billing/types";
+import type { Task } from "@/components/billing/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

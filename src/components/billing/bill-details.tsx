@@ -19,7 +19,7 @@ import { Boxes, Eye, SplitSquareHorizontal } from "lucide-react";
 import React, { useState } from "react";
 import { SplitItemDialog } from "./split-item";
 import { Money } from "./money";
-import { BillItem, BillRow } from "./types";
+import type { BillItem, BillRow } from "./types";
 
 export const BillDetails: React.FC<{ bill: BillRow; items: BillItem[] }> = ({
   bill,

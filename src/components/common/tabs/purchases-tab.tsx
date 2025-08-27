@@ -2,14 +2,14 @@ import { BillDetails } from "@/components/billing/bill-details";
 import { Money } from "@/components/billing/money";
 import { RemainingBadge } from "@/components/billing/remaining-badge";
 import { StatCard } from "@/components/billing/stat-card";
-import {
+import type {
   BillItem,
   BillRow,
   PaymentApp,
   PORow,
 } from "@/components/billing/types";
 import { POCreator } from "@/components/po/po-creator";
-import { Product } from "@/components/product/types";
+import type { Product } from "@/components/product/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,7 +85,7 @@ export const PurchasesTab: React.FC<{
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-3">
         <StatCard
           label="Total Amount"
           value={`$${totals.totalAmt.toLocaleString()}`}
@@ -111,9 +111,8 @@ export const PurchasesTab: React.FC<{
         <CardHeader className=" pb-0">
           <CardTitle className="text-2xl">Purchase Orders</CardTitle>
         </CardHeader>
-        <CardContent className="p-4 space-y-4">
+        <CardContent className="p-4 space-y-4 overflow-hidden">
           <div className="flex gap-3 items-center">
-            {/* Search Input */}
             <div className="relative w-full md:max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input
@@ -124,7 +123,6 @@ export const PurchasesTab: React.FC<{
               />
             </div>
 
-            {/* Status Filter */}
             <Select value={poStatus} onValueChange={setPoStatus}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="PO Status" />
@@ -138,15 +136,13 @@ export const PurchasesTab: React.FC<{
               </SelectContent>
             </Select>
 
-            {/* Create PO */}
             <POCreator
               products={products}
               onCreated={(po) => setPOs([po, ...pos])}
             />
           </div>
 
-          {/* Purchase Orders Table */}
-          <div className="border rounded-xl overflow-hidden">
+          <div className="border rounded-xl">
             <Table>
               <TableHeader>
                 <TableRow>

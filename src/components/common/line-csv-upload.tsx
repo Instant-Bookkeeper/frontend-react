@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { POLine } from "../po/types";
+import type { POLine } from "../po/types";
 import { parseCSV } from "@/lib/utils";
 
 export const LineCSVUpload: React.FC<{

@@ -6,7 +6,7 @@
 import { AddProduct } from "@/components/product/add-product";
 import { AssignProductsModal } from "@/components/product/assign-product";
 import { ProductsTable } from "@/components/product/products-table";
-import { CatalogSKU, Product } from "@/components/product/types";
+import type { CatalogSKU, Product } from "@/components/product/types";
 import { ViewEditProduct } from "@/components/product/view-product";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -153,7 +153,7 @@ export default function ProductsPage() {
     );
   }
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-8 space-y-6">
+    <div className="space-y-6">
       {/* Title + actions */}
       <div className="flex items-center justify-between gap-4">
         <div>
@@ -183,7 +183,7 @@ export default function ProductsPage() {
             <Filter className="size-4" /> Filters
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-4 grid grid-cols-12 gap-3">
+        <CardContent className="px-6 grid grid-cols-12 gap-3">
           <div className="col-span-12 md:col-span-5">
             <Label className="mb-2">Search</Label>
             <Input

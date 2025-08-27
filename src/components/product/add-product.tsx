@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
-import { Product } from "./types";
+import type { Product } from "./types";
 import { uid } from "@/lib/utils";
 import { ProductCombobox } from "./product-search";
 import { ProductForm } from "./product-form";

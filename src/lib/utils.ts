@@ -1,4 +1,4 @@
-import { CurrencyCode } from "@/components/po/types";
+import type { CurrencyCode } from "@/components/po/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 /* =====================================================

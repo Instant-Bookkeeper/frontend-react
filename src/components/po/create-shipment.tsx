@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Table } from "../ui/table";
-import { Attachment, PORow, ShipmentItem, ShipmentRow } from "./types";
+import type { Attachment, PORow, ShipmentItem, ShipmentRow } from "./types";
 
 export const CreateShipmentDialog: React.FC<{
   open: boolean;

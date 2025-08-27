@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import React, { useState } from "react";
-import { Product } from "./types";
+import type { Product } from "./types";
 import { ProductForm } from "./product-form";
 
 export const ViewEditProduct: React.FC<{

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tags as TagsIcon } from "lucide-react";
 import React from "react";
-import { Product } from "./types";
+import type { Product } from "./types";
 import { TagInput } from "../common/tag-input";
 
 export const ProductForm: React.FC<{
@@ -32,7 +32,7 @@ export const ProductForm: React.FC<{
       />
     </div>
     <div className="col-span-12 md:col-span-8">
-      <Label>Product Name</Label>
+      <Label className="mb-2">Product Name</Label>
       <Input
         value={draft.product_name}
         onChange={(e) => onChange({ ...draft, product_name: e.target.value })}
@@ -40,21 +40,21 @@ export const ProductForm: React.FC<{
       />
     </div>
     <div className="col-span-12 md:col-span-6">
-      <Label>Brand</Label>
+      <Label className="mb-2">Brand</Label>
       <Input
         value={draft.brand || ""}
         onChange={(e) => onChange({ ...draft, brand: e.target.value })}
       />
     </div>
     <div className="col-span-12 md:col-span-6">
-      <Label>Category</Label>
+      <Label className="mb-2">Category</Label>
       <Input
         value={draft.category || ""}
         onChange={(e) => onChange({ ...draft, category: e.target.value })}
       />
     </div>
     <div className="col-span-12">
-      <Label className="flex items-center gap-2">
+      <Label className="flex items-center gap-2 mb-2">
         <TagsIcon className="size-4" />
         SKUs
       </Label>
@@ -65,7 +65,7 @@ export const ProductForm: React.FC<{
       />
     </div>
     <div className="col-span-12">
-      <Label className="flex items-center gap-2">
+      <Label className="flex items-center gap-2 mb-2">
         <TagsIcon className="size-4" />
         ASINs
       </Label>
@@ -76,7 +76,7 @@ export const ProductForm: React.FC<{
       />
     </div>
     <div className="col-span-12">
-      <Label className="flex items-center gap-2">
+      <Label className="flex items-center gap-2 mb-2">
         <TagsIcon className="size-4" />
         UPCs
       </Label>
@@ -87,11 +87,11 @@ export const ProductForm: React.FC<{
       />
     </div>
     <div className="col-span-6">
-      <Label>Total Sold (read-only)</Label>
+      <Label className="mb-2">Total Sold (read-only)</Label>
       <Input type="number" value={draft.total_sold ?? 0} readOnly disabled />
     </div>
     <div className="col-span-6">
-      <Label>Total Profit (read-only)</Label>
+      <Label className="mb-2">Total Profit (read-only)</Label>
       <Input type="number" value={draft.total_profit ?? 0} readOnly disabled />
     </div>
   </div>

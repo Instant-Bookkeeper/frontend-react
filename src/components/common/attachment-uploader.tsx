@@ -1,4 +1,4 @@
-import { Attachment } from "../po/types";
+import type { Attachment } from "../po/types";
 
 export const AttachmentUploader: React.FC<{
   attachments: Attachment[];

@@ -12,7 +12,7 @@ import {
   MOCK_SHIPMENTS,
   MOCK_TASKS,
 } from "@/components/billing/option";
-import {
+import type {
   Adjustment,
   BillItem,
   BillRow,
@@ -25,7 +25,7 @@ import {
   Task,
 } from "@/components/billing/types";
 import { POCreator } from "@/components/po/po-creator";
-import { Product } from "@/components/product/types";
+import type { Product } from "@/components/product/types";
 import {
   Tooltip,
   TooltipContent,
@@ -48,6 +48,9 @@ import { FBATab } from "../tabs/fba-tab";
 import { AdjustmentsTab } from "../tabs/adjustments-tab";
 import { TasksTab } from "../tabs/tasks-tab";
 import { ProductsTab } from "../tabs/products-tab";
+import { Link, Outlet } from "react-router";
+import clsx from "clsx";
+import Header from "./header";
 type TabType =
   | "purchases"
   | "products"
@@ -56,6 +59,20 @@ type TabType =
   | "fba"
   | "adjustments"
   | "tasks";
+
+const links = [
+  { key: "purchases", label: "Purchases", icon: ShoppingCart },
+  { key: "products", label: "Products", icon: Boxes },
+  { key: "payments", label: "Payments", icon: DollarSign },
+  { key: "removals", label: "Removals", icon: ClipboardList },
+  { key: "fba", label: "FBA Shipments", icon: PackageSearch },
+  {
+    key: "adjustments",
+    label: "Adjustments",
+    icon: SplitSquareHorizontal,
+  },
+  { key: "tasks", label: "Tasks", icon: ClipboardList },
+];
 export default function AppCanvas() {
   const [products] = useState<Product[]>(MOCK_PRODUCTS);
   const [pos, setPOs] = useState<PORow[]>(MOCK_POS);
@@ -70,12 +87,14 @@ export default function AppCanvas() {
     useState<Adjustment[]>(MOCK_ADJUSTMENTS);
   const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
 
-  const [tab, setTab] = useState<TabType>("purchases");
+  const [tab, setTab] = useState<TabType>("products");
 
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
+    <>
+      <Header />
+      <div className="mx-auto max-w-7xl p-4 md:p-8 space-y-6">
+        {/* Header */}
+        {/* <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold">Ops Console</h1>
           <p className="text-sm text-muted-foreground">
@@ -89,52 +108,45 @@ export default function AppCanvas() {
             onCreated={(po) => setPOs([po, ...pos])}
           />
         </div>
-      </div>
+      </div> */}
 
-      {/* Layout with compact side nav */}
-      <div className="flex gap-4">
-        {/* Side Navigation */}
-        <TooltipProvider>
-          <aside className="sticky top-4 h-fit">
-            <nav className="flex flex-col gap-1 p-1 rounded-2xl border bg-background/50 w-14">
-              {[
-                { key: "purchases", label: "Purchases", icon: ShoppingCart },
-                { key: "products", label: "Products", icon: Boxes },
-                { key: "payments", label: "Payments", icon: DollarSign },
-                { key: "removals", label: "Removals", icon: ClipboardList },
-                { key: "fba", label: "FBA Shipments", icon: PackageSearch },
-                {
-                  key: "adjustments",
-                  label: "Adjustments",
-                  icon: SplitSquareHorizontal,
-                },
-                { key: "tasks", label: "Tasks", icon: ClipboardList },
-              ].map(({ key, label, icon: Icon }) => (
-                <Tooltip key={key}>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => setTab(key as TabType)}
-                      className={`flex items-center justify-center rounded-xl p-3 transition-colors ${
-                        tab === key
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-muted"
-                      }`}
-                      aria-label={label}
-                      title={label}
-                    >
-                      <Icon className="size-5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">{label}</TooltipContent>
-                </Tooltip>
-              ))}
-            </nav>
-          </aside>
-        </TooltipProvider>
+        {/* Layout with compact side nav */}
+        <div className="relative flex gap-4">
+          {/* Side Navigation */}
+          <TooltipProvider>
+            <aside className="absolute -bg-conic-0 -left-16 h-fit">
+              <nav className="flex flex-col gap-1 p-1 rounded-2xl border bg-background/50 w-14">
+                {links.map(({ key, label, icon: Icon }) => (
+                  <Tooltip key={key}>
+                    <TooltipTrigger asChild>
+                      <Link
+                        to={key}
+                        onClick={() => setTab(key as TabType)}
+                        className={clsx(
+                          `flex items-center justify-center rounded-xl p-3 transition-colors`,
+                          tab === key
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted",
+                          key !== "products"
+                            ? "pointer-events-none text-muted-foreground"
+                            : ""
+                        )}
+                        aria-label={label}
+                        title={label}
+                      >
+                        <Icon className="size-5" />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">{label}</TooltipContent>
+                  </Tooltip>
+                ))}
+              </nav>
+            </aside>
+          </TooltipProvider>
 
-        {/* Main content area */}
-        <div className="flex-1 space-y-4">
-          {tab === "purchases" && (
+          {/* Main content area */}
+          <div className="flex-1 space-y-4">
+            {/* {tab === "purchases" && (
             <PurchasesTab
               products={products}
               pos={pos}
@@ -144,11 +156,13 @@ export default function AppCanvas() {
               billItems={billItems}
               paymentApps={apps}
             />
-          )}
+          )} */}
 
-          {tab === "products" && <ProductsTab products={products} />}
+            <Outlet />
 
-          {tab === "payments" && (
+            {/* {tab === "products" && <ProductsTab products={products} />} */}
+
+            {/* {tab === "payments" && (
             <PaymentsTab
               payments={payments}
               setPayments={setPayments}
@@ -177,9 +191,10 @@ export default function AppCanvas() {
             />
           )}
 
-          {tab === "tasks" && <TasksTab tasks={tasks} setTasks={setTasks} />}
+          {tab === "tasks" && <TasksTab tasks={tasks} setTasks={setTasks} />} */}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

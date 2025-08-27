@@ -1,6 +1,6 @@
-import {
-  BillItem,
+import type {
   RemovalRow,
+  BillItem,
   Shipment,
   ShipmentItem,
 } from "@/components/billing/types";

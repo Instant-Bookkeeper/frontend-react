@@ -1,5 +1,5 @@
 import { RemainingBadge } from "@/components/billing/remaining-badge";
-import { RemovalRow } from "@/components/billing/types";
+import type { RemovalRow } from "@/components/billing/types";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
