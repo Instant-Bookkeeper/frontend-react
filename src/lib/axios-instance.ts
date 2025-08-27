@@ -15,9 +15,9 @@ export const axiosInstance = axios.create({
 // ====================== Request Interceptor ======================
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("token");
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = token;
     }
 
     // Request logger for dev mode
@@ -41,6 +41,7 @@ axiosInstance.interceptors.request.use(
 type ErrorRespone = {
   messageCode: number;
   description: string;
+  createdId?: number;
 };
 // ====================== Response Interceptor ======================
 axiosInstance.interceptors.response.use(

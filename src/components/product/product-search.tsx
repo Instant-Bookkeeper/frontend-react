@@ -36,7 +36,7 @@ export const ProductCombobox: React.FC<{
           className="w-full justify-between"
         >
           {value
-            ? products.find((p) => p.product_id === value)?.product_name
+            ? products.find((p) => p.id === value)?.productName
             : "Select product..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -48,20 +48,20 @@ export const ProductCombobox: React.FC<{
           <CommandGroup>
             {products.map((product) => (
               <CommandItem
-                key={product.product_id}
-                value={product.product_name}
+                key={product.id}
+                value={product.productName}
                 onSelect={() => {
-                  onValueChange(product.product_id);
+                  onValueChange(product.id);
                   setOpen(false);
                 }}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    value === product.product_id ? "opacity-100" : "opacity-0"
+                    value === product.id ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {product.product_name}
+                {product.productName}
               </CommandItem>
             ))}
           </CommandGroup>

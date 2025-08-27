@@ -1,14 +1,20 @@
 export type Product = {
-  product_id: string;
-  product_name: string;
-  image_url?: string;
+  id: string;
+  productName: string;
   skus: string[];
   asins?: string[];
   upcs?: string[];
-  brand?: string;
-  category?: string;
-  total_sold?: number;
-  total_profit?: number;
+  brandName?: string;
+  categoryName?: string;
+  totalSold?: number;
+  totalProfit?: number;
+};
+
+export type Brand = {
+  id: number;
+  brandName: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type CatalogSKU = { sku: string; description?: string };

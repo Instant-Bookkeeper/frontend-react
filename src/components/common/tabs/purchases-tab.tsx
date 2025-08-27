@@ -136,10 +136,10 @@ export const PurchasesTab: React.FC<{
               </SelectContent>
             </Select>
 
-            <POCreator
+            {/* <POCreator
               products={products}
               onCreated={(po) => setPOs([po, ...pos])}
-            />
+            /> */}
           </div>
 
           <div className="border rounded-xl">

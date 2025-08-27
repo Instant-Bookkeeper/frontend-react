@@ -19,7 +19,7 @@ export const ProductForm: React.FC<{
 }> = ({ draft, disableName, onChange }) => (
   <div className="grid grid-cols-12 gap-3">
     <div className="col-span-12 md:col-span-4">
-      <Label>Image URL</Label>
+      {/* <Label>Image URL</Label>
       <Input
         value={draft.image_url || ""}
         onChange={(e) =>
@@ -29,28 +29,28 @@ export const ProductForm: React.FC<{
           })
         }
         placeholder="https://..."
-      />
+      /> */}
     </div>
     <div className="col-span-12 md:col-span-8">
       <Label className="mb-2">Product Name</Label>
       <Input
-        value={draft.product_name}
-        onChange={(e) => onChange({ ...draft, product_name: e.target.value })}
+        value={draft.productName}
+        onChange={(e) => onChange({ ...draft, productName: e.target.value })}
         disabled={disableName}
       />
     </div>
     <div className="col-span-12 md:col-span-6">
       <Label className="mb-2">Brand</Label>
       <Input
-        value={draft.brand || ""}
-        onChange={(e) => onChange({ ...draft, brand: e.target.value })}
+        value={draft.brandName || ""}
+        onChange={(e) => onChange({ ...draft, brandName: e.target.value })}
       />
     </div>
     <div className="col-span-12 md:col-span-6">
       <Label className="mb-2">Category</Label>
       <Input
-        value={draft.category || ""}
-        onChange={(e) => onChange({ ...draft, category: e.target.value })}
+        value={draft.categoryName || ""}
+        onChange={(e) => onChange({ ...draft, categoryName: e.target.value })}
       />
     </div>
     <div className="col-span-12">
@@ -88,11 +88,11 @@ export const ProductForm: React.FC<{
     </div>
     <div className="col-span-6">
       <Label className="mb-2">Total Sold (read-only)</Label>
-      <Input type="number" value={draft.total_sold ?? 0} readOnly disabled />
+      <Input type="number" value={draft.totalSold ?? 0} readOnly disabled />
     </div>
     <div className="col-span-6">
       <Label className="mb-2">Total Profit (read-only)</Label>
-      <Input type="number" value={draft.total_profit ?? 0} readOnly disabled />
+      <Input type="number" value={draft.totalProfit ?? 0} readOnly disabled />
     </div>
   </div>
 );
