@@ -4,7 +4,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -13,12 +12,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Boxes } from "lucide-react";
-import React from "react";
-import type { Product } from "./types";
-import { CompactTags } from "../common/compact-tags";
 import { currency } from "@/lib/utils";
-import { Scrollbar } from "@radix-ui/react-scroll-area";
+import { Boxes, SquarePen } from "lucide-react";
+import React from "react";
+import { CompactTags } from "../common/compact-tags";
+import type { Product } from "./types";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Badge } from "../ui/badge";
 
 export const ProductsTable: React.FC<{
   products: Product[];
@@ -45,9 +45,7 @@ export const ProductsTable: React.FC<{
               <TableHead>Category</TableHead>
               <TableHead className="text-right">Total Sold</TableHead>
               <TableHead className="text-right">Total Profit</TableHead>
-              <TableHead className="text-center w-[124px] ">
-                View/Edit
-              </TableHead>
+              <TableHead className="text-center w-[124px] ">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -57,11 +55,49 @@ export const ProductsTable: React.FC<{
                 <TableCell className="">
                   <CompactTags list={p.skus} variant="secondary" />
                 </TableCell>
-                <TableCell className="">
-                  <CompactTags list={p.asins} />
+                <TableCell className="text-center">
+                  {p.asins?.length ? (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Badge variant="outline" className="cursor-pointer">
+                          {p.asins?.length}
+                        </Badge>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-2 max-w-xs">
+                        <div className="flex flex-wrap gap-1">
+                          {p.asins?.map((v) => (
+                            <Badge key={v} variant={"outline"}>
+                              {v}
+                            </Badge>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    "—"
+                  )}
                 </TableCell>
-                <TableCell className="">
-                  <CompactTags list={p.upcs} />
+                <TableCell className="text-center">
+                  {p.upcs?.length ? (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Badge variant="outline" className="cursor-pointer">
+                          {p.upcs?.length}
+                        </Badge>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-2 max-w-xs">
+                        <div className="flex flex-wrap gap-1">
+                          {p.upcs?.map((v) => (
+                            <Badge key={v} variant={"outline"}>
+                              {v}
+                            </Badge>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    "—"
+                  )}
                 </TableCell>
                 <TableCell>{p.brandName || "—"}</TableCell>
                 <TableCell>{p.categoryName || "—"}</TableCell>
@@ -73,12 +109,12 @@ export const ProductsTable: React.FC<{
                 </TableCell>
                 <TableCell className="text-center w-[124px] ">
                   <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-7 text-xs px-2"
+                    size="icon"
+                    variant="secondary"
+                    className="h-7 text-xs px-2 cursor-pointer"
                     onClick={() => onEdit(p)}
                   >
-                    View/Edit
+                    <SquarePen />
                   </Button>
                 </TableCell>
               </TableRow>

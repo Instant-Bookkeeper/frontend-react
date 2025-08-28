@@ -12,11 +12,23 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
-import type { Product } from "./types";
-import { uid } from "@/lib/utils";
+import { createProduct } from "@/services/product.service";
+import { useMutation } from "@tanstack/react-query";
+import React from "react";
+import { ProductForm, type DefaultValues } from "./product-form";
 import { ProductCombobox } from "./product-search";
-import { ProductForm } from "./product-form";
+import type { Product } from "./types";
+
+const defaultValues = {
+  productName: "",
+  brandId: 0,
+  brandName: "",
+  productCategoryId: 0,
+  productCategoryName: "",
+  asins: [],
+  skus: [],
+  upcs: [],
+};
 
 export const AddProduct: React.FC<{
   open: boolean;
@@ -33,22 +45,15 @@ export const AddProduct: React.FC<{
   existingProducts,
   onOpenExisting,
 }) => {
-  const [draft, setDraft] = useState<Product>({
-    id: uid("P"),
-    productName: "",
-
-    brandName: "",
-    categoryName: "",
-    skus: [],
-    asins: [],
-    upcs: [],
-    totalSold: 0,
-    totalProfit: 0,
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["create-product"],
+    mutationFn: createProduct,
   });
-  React.useEffect(() => {
-    if (open) setDraft((d) => ({ ...d, skus: presetSKU ? [presetSKU] : [] }));
-  }, [open, presetSKU]);
-  const canSave = draft.productName.trim().length > 0;
+
+  const handleCreateProduct = (payload: Partial<DefaultValues>) => {
+    console.log(payload);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
@@ -66,16 +71,19 @@ export const AddProduct: React.FC<{
             />
           </div>
         </div>
-        <ProductForm mode="add" draft={draft} onChange={setDraft} />
+        <ProductForm
+          mode="add"
+          onSubmit={handleCreateProduct}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
-            disabled={!canSave}
+            form="productForm"
             onClick={() => {
-              onCreate(draft);
-              onOpenChange(false);
+              // onOpenChange(false);
             }}
           >
             Create

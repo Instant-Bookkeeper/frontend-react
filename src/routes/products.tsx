@@ -20,6 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  useBrands,
+  useCategories,
+  useProducts,
+} from "@/services/product-hooks";
+import {
   getBrands,
   getProductCategories,
   getProducts,
@@ -37,20 +42,11 @@ const MOCK_SKU_CATALOG: CatalogSKU[] = [
 ];
 
 export default function ProductsPage() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["products"],
-    queryFn: () => getProducts({ pageNumber: 1, pageSize: 10 }),
-  });
+  const { data, isLoading } = useProducts();
 
-  const { data: brandsData } = useQuery({
-    queryKey: ["brands"],
-    queryFn: () => getBrands({ pageNumber: 1, pageSize: 10 }),
-  });
+  const { data: brandsData } = useBrands();
 
-  const { data: categoriesData } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => getProductCategories({ pageNumber: 1, pageSize: 10 }),
-  });
+  const { data: categoriesData } = useCategories();
 
   console.log("Products", data);
   console.log("Brands", brandsData);

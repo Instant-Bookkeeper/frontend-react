@@ -1,29 +1,39 @@
 import type { Brand, Product } from "@/components/product/types";
 import { axiosInstance } from "@/lib/axios-instance";
+import type { SKU } from "./sku.service";
 
 // ====================== Types ======================
 
-type ProductsParams = {
+export type FilterParams = {
   pageNumber: number;
   pageSize: number;
-  brandId?: string;
-  productCategoryId?: string;
   searchTerm?: string;
 };
 
-type BrandParams = {
-  pageNumber: number;
-  pageSize: number;
-  searchTerm?: string;
+export type ProductsParams = FilterParams & {
+  brandId?: string;
+  productCategoryId?: string;
 };
 
 type ProductsResponse = {
   totalItems: number;
   products: Product[];
 };
+
 type BrandResponse = {
   totalItems: number;
   brands: Brand[];
+};
+
+export type ProductPayload = {
+  productName: string;
+  brandId: number;
+  brandName: string;
+  productCategoryId: number;
+  productCategoryName: string;
+  asins: string[];
+  skus: SKU[];
+  upcs: string[];
 };
 
 // ====================== API Calls ======================
@@ -34,11 +44,25 @@ export const getProducts = (
 ): Promise<ProductsResponse> => axiosInstance.get(`/products`, { params });
 
 // All Brands
-export const getBrands = (params: BrandParams): Promise<BrandResponse> =>
+export const getBrands = (params: FilterParams): Promise<BrandResponse> =>
   axiosInstance.get(`/brands`, { params });
 
 // All Product Categories
 export const getProductCategories = (
-  params: BrandParams
+  params: FilterParams
 ): Promise<ProductsResponse> =>
   axiosInstance.get(`/product-categories`, { params });
+
+// Create Product
+export const createProduct = (
+  payload: ProductPayload
+): Promise<ProductsResponse> => axiosInstance.post(`/products`, payload);
+
+// Get Single Product
+export const getProduct = (productId: string): Promise<Product> =>
+  axiosInstance.get(`/products/${productId}`);
+
+// Update Product
+export const updateProduct = (
+  payload: Partial<ProductPayload>
+): Promise<ProductsResponse> => axiosInstance.put(`/products`, payload);
