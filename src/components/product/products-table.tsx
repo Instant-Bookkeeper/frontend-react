@@ -22,7 +22,7 @@ import { Badge } from "../ui/badge";
 
 export const ProductsTable: React.FC<{
   products: Product[];
-  onEdit: (p: Product) => void;
+  onEdit: (productId: number) => void;
 }> = ({ products, onEdit }) => (
   <Card className="rounded-2xl gap-0">
     <CardHeader className="pb-0">
@@ -112,7 +112,7 @@ export const ProductsTable: React.FC<{
                     size="icon"
                     variant="secondary"
                     className="h-7 text-xs px-2 cursor-pointer"
-                    onClick={() => onEdit(p)}
+                    onClick={() => onEdit(p.id)}
                   >
                     <SquarePen />
                   </Button>

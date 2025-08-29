@@ -1,5 +1,5 @@
 export type Product = {
-  id: string;
+  id: number;
   productName: string;
   skus: string[];
   asins?: string[];
@@ -18,3 +18,10 @@ export type Brand = {
 };
 
 export type CatalogSKU = { sku: string; description?: string };
+
+export type ProductCategory = {
+  id: number;
+  categoryName: string;
+  createdAt: string;
+  updatedAt: string;
+};

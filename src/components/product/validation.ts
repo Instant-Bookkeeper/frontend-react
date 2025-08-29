@@ -2,8 +2,8 @@ import * as yup from "yup";
 
 export const skuSchema = yup.object().shape({
   sku: yup.string().required("SKU is required"),
-  condition: yup.string(),
-  description: yup.string(),
+  condition: yup.string().nullable().optional(),
+  description: yup.string().nullable().optional(),
 });
 
 export const productSchema = yup.object({
@@ -15,8 +15,6 @@ export const productSchema = yup.object({
     .typeError("Category ID must be a number")
     .required(),
   productCategoryName: yup.string().required("Category name is required"),
-
-  // ✅ Arrays always default to []
   asins: yup.array().of(yup.string().required()).default([]).required(),
   skus: yup.array().of(skuSchema).default([]).required(),
   upcs: yup.array().of(yup.string().required()).default([]).required(),

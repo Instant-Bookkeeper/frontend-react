@@ -12,12 +12,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { createProduct } from "@/services/product.service";
-import { useMutation } from "@tanstack/react-query";
+import { createProduct, type ProductPayload } from "@/services/product.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { ProductForm, type DefaultValues } from "./product-form";
+import { ProductForm } from "./product-form";
 import { ProductCombobox } from "./product-search";
 import type { Product } from "./types";
+import { toast } from "sonner";
 
 const defaultValues = {
   productName: "",
@@ -28,35 +29,36 @@ const defaultValues = {
   asins: [],
   skus: [],
   upcs: [],
+  totalSold: 0,
+  totalProfit: 0,
 };
 
 export const AddProduct: React.FC<{
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  onCreate: (p: Product) => void;
-  presetSKU?: string;
   existingProducts: Product[];
-  onOpenExisting?: (product_id: string) => void;
-}> = ({
-  open,
-  onOpenChange,
-  onCreate,
-  presetSKU,
-  existingProducts,
-  onOpenExisting,
-}) => {
+  onOpenExisting?: (productId: number) => void;
+}> = ({ open, onOpenChange, existingProducts, onOpenExisting }) => {
   const { mutate, isPending } = useMutation({
     mutationKey: ["create-product"],
     mutationFn: createProduct,
   });
 
-  const handleCreateProduct = (payload: Partial<DefaultValues>) => {
-    console.log(payload);
+  const queryClient = useQueryClient();
+
+  const handleCreateProduct = (payload: ProductPayload) => {
+    mutate(payload, {
+      onSuccess: () => {
+        toast("A new Product has been added", { position: "top-right" });
+        onOpenChange(false);
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      },
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent aria-describedby="Add Product Form" className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>New Product</DialogTitle>
         </DialogHeader>
@@ -80,12 +82,7 @@ export const AddProduct: React.FC<{
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            form="productForm"
-            onClick={() => {
-              // onOpenChange(false);
-            }}
-          >
+          <Button form="productForm" disabled={isPending}>
             Create
           </Button>
         </DialogFooter>

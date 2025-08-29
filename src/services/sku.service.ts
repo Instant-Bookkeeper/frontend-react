@@ -4,11 +4,11 @@ import { axiosInstance } from "@/lib/axios-instance";
 
 export type SKU = {
   sku: string;
-  condition?: string;
-  description?: string;
+  condition?: string | null;
+  description?: string | null;
 };
 
-type SKUResponse = {
+export type SKUResponse = {
   availableSkus: SKU[];
   totalItems: number;
 };

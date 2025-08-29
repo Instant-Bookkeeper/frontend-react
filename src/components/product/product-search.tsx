@@ -22,8 +22,8 @@ import type { Product } from "./types";
 
 export const ProductCombobox: React.FC<{
   products: Product[];
-  value?: string;
-  onValueChange: (value: string) => void;
+  value?: number;
+  onValueChange: (value: number) => void;
 }> = ({ products, value, onValueChange }) => {
   const [open, setOpen] = useState(false);
   return (

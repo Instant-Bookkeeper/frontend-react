@@ -6,33 +6,50 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tags as TagsIcon } from "lucide-react";
-import React from "react";
-import { TagInput } from "../common/tag-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useBrands, useCategories } from "@/services/product-hooks";
 import type { ProductPayload } from "@/services/product.service";
-import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import React from "react";
+import { Controller, useForm } from "react-hook-form";
+import { TagInput } from "../common/tag-input";
+import { SKUInput } from "./sku-input";
 import { productSchema } from "./validation";
+import { CreateSKUFormPopover } from "./create-sku-popover";
+import { Button } from "../ui/button";
 
-export type DefaultValues = ProductPayload & {
-  totalSold: string;
-  totalProfit: string;
-};
+export type DefaultValues = ProductPayload; // May extend in future
 
 export const ProductForm: React.FC<{
   mode: "add" | "edit";
-  defaultValues?: Partial<DefaultValues>;
-  onSubmit: (payload: Partial<DefaultValues>) => void;
+  defaultValues?: DefaultValues;
+  onSubmit: (payload: ProductPayload) => void;
 }> = ({ mode, defaultValues, onSubmit }) => {
+  const { data: brandsData } = useBrands();
+
+  const { data: categoriesData } = useCategories();
+
   const {
     control,
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<ProductPayload>({
     resolver: yupResolver(productSchema),
     defaultValues,
   });
+
+  const { productCategories } = categoriesData || {};
+  const { brands } = brandsData || {};
+  console.log(watch("skus"));
 
   return (
     <form
@@ -52,7 +69,34 @@ export const ProductForm: React.FC<{
       {/* Brand */}
       <div className="col-span-12 md:col-span-6">
         <Label className="mb-2">Brand</Label>
-        <Input {...register("brandName")} />
+        <Controller
+          name="brandId"
+          control={control}
+          render={({ field }) => (
+            <Select
+              onValueChange={(val) => {
+                const selectedId = Number(val);
+                const selected = brands?.find((c) => c.id === selectedId);
+
+                field.onChange(selectedId);
+                setValue("brandName", selected?.brandName || "");
+              }}
+              value={field.value ? String(field.value) : ""}
+              disabled={!categoriesData}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Brand" />
+              </SelectTrigger>
+              <SelectContent>
+                {brands?.map((cat) => (
+                  <SelectItem key={cat.id} value={String(cat.id)}>
+                    {cat.brandName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
         {errors.brandName && (
           <p className="text-red-500 text-sm">{errors.brandName.message}</p>
         )}
@@ -61,37 +105,69 @@ export const ProductForm: React.FC<{
       {/* Category */}
       <div className="col-span-12 md:col-span-6">
         <Label className="mb-2">Category</Label>
-        <Input {...register("productCategoryName")} />
-        {errors.productCategoryName && (
+        <Controller
+          name="productCategoryId"
+          control={control}
+          render={({ field }) => (
+            <Select
+              onValueChange={(val) => {
+                const selectedId = Number(val);
+                const selected = productCategories?.find(
+                  (c) => c.id === selectedId
+                );
+
+                field.onChange(selectedId);
+                setValue("productCategoryName", selected?.categoryName || "");
+              }}
+              value={field.value ? String(field.value) : ""}
+              disabled={!categoriesData}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {productCategories?.map((cat) => (
+                  <SelectItem key={cat.id} value={String(cat.id)}>
+                    {cat.categoryName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+
+        {errors.productCategoryId && (
           <p className="text-red-500 text-sm">
-            {errors.productCategoryName.message}
+            {errors.productCategoryId.message}
           </p>
         )}
       </div>
 
       {/* SKUs */}
       <div className="col-span-12">
-        <Label className="flex items-center gap-2 mb-2">
-          <TagsIcon className="size-4" />
-          SKUs
+        <Label className="flex items-center justify-between gap-2 mb-2">
+          <span>SKUs</span>
+          <CreateSKUFormPopover
+            trigger={
+              <Button size={"sm"} variant={"link"} className="p-0  h-4">
+                Create New
+              </Button>
+            }
+          />
         </Label>
         <Controller
           control={control}
           name="skus"
           render={({ field }) => (
-            <TagInput
-              value={field.value?.map((s) => s.sku) || []}
-              onChange={(values) =>
+            <SKUInput
+              value={field.value.map((val) => val.sku)}
+              onChange={(values: string[]) =>
                 field.onChange(
-                  values.map((sku) => ({
-                    id: 0,
-                    sku,
-                    condition: "",
-                    description: "",
+                  values.map((val) => ({
+                    sku: val,
                   }))
                 )
               }
-              placeholder="Add SKU and press Enter"
             />
           )}
         />
@@ -102,10 +178,7 @@ export const ProductForm: React.FC<{
 
       {/* ASINs */}
       <div className="col-span-12">
-        <Label className="flex items-center gap-2 mb-2">
-          <TagsIcon className="size-4" />
-          ASINs
-        </Label>
+        <Label className="flex items-center gap-2 mb-2">ASINs</Label>
         <Controller
           control={control}
           name="asins"
@@ -122,10 +195,7 @@ export const ProductForm: React.FC<{
 
       {/* UPCs */}
       <div className="col-span-12">
-        <Label className="flex items-center gap-2 mb-2">
-          <TagsIcon className="size-4" />
-          UPCs
-        </Label>
+        <Label className="flex items-center gap-2 mb-2">UPCs</Label>
         <Controller
           control={control}
           name="upcs"
@@ -141,7 +211,7 @@ export const ProductForm: React.FC<{
       </div>
 
       {/* Read-only totals */}
-      {mode === "edit" && (
+      {/* {mode === "edit" && (
         <>
           <div className="col-span-6">
             <Label className="mb-2">Total Sold (read-only)</Label>
@@ -162,7 +232,7 @@ export const ProductForm: React.FC<{
             />
           </div>
         </>
-      )}
+      )} */}
     </form>
   );
 };

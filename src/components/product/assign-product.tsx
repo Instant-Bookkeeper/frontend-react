@@ -82,13 +82,13 @@ export const AssignProductsModal: React.FC<{
                         {row.description || "—"}
                       </TableCell>
                       <TableCell>
-                        <ProductCombobox
+                        {/* <ProductCombobox
                           products={products}
                           value={selectedTarget[row.sku]}
                           onValueChange={(v) =>
                             setSelectedTarget((s) => ({ ...s, [row.sku]: v }))
                           }
-                        />
+                        /> */}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">

@@ -19,17 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  useBrands,
-  useCategories,
-  useProducts,
-} from "@/services/product-hooks";
-import {
-  getBrands,
-  getProductCategories,
-  getProducts,
-} from "@/services/product.service";
-import { useQuery } from "@tanstack/react-query";
+import { useProducts } from "@/services/product-hooks";
 import { Filter, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -44,51 +34,19 @@ const MOCK_SKU_CATALOG: CatalogSKU[] = [
 export default function ProductsPage() {
   const { data, isLoading } = useProducts();
 
-  const { data: brandsData } = useBrands();
-
-  const { data: categoriesData } = useCategories();
-
-  console.log("Products", data);
-  console.log("Brands", brandsData);
-  console.log("Categories", categoriesData);
-
-  // Filters
-
   // Edit modal
   const [editOpen, setEditOpen] = useState(false);
-  const [editing, setEditing] = useState<Product | null>(null);
-  const openEdit = (p: Product) => {
-    setEditing(p);
+  const [productId, setProductId] = useState<number | null>(null);
+  const openEdit = (p: number) => {
+    setProductId(p);
     setEditOpen(true);
   };
-  const saveEdit = (next: Product) => {};
   // Add product (with optional preset SKU)
   const [addOpen, setAddOpen] = useState(false);
   const [presetSKU, setPresetSKU] = useState<string | undefined>(undefined);
-  const createProduct = (p: Product) => {};
 
   // Assign products
   const [assignOpen, setAssignOpen] = useState(false);
-
-  // function doAssign({
-  //   targetProduct,
-  //   selectedSKUs,
-  // }: {
-  //   targetProduct?: string;
-  //   selectedSKUs: string[];
-  // }) {
-  //   if (!selectedSKUs.length || !targetProduct) return;
-  //   setAllProducts((prev) =>
-  //     prev.map((p) =>
-  //       p.id !== targetProduct
-  //         ? p
-  //         : {
-  //             ...p,
-  //             skus: Array.from(new Set([...(p.skus || []), ...selectedSKUs])),
-  //           }
-  //     )
-  //   );
-  // }
 
   if (isLoading)
     return (
@@ -97,7 +55,7 @@ export default function ProductsPage() {
       </div>
     );
 
-  const { products, totalItems } = data || {};
+  const { products } = data || {};
 
   if (!products) return null;
 
@@ -133,20 +91,17 @@ export default function ProductsPage() {
       <ViewEditProduct
         open={editOpen}
         onOpenChange={setEditOpen}
-        product={editing}
-        onSave={saveEdit}
+        productId={productId}
       />
       <AddProduct
         open={addOpen}
         onOpenChange={setAddOpen}
-        onCreate={createProduct}
-        presetSKU={presetSKU}
         existingProducts={products}
         onOpenExisting={(id) => {
           const p = products.find((x) => x.id === id);
           if (p) {
             setAddOpen(false);
-            openEdit(p);
+            openEdit(p.id);
           }
         }}
       />
@@ -185,29 +140,6 @@ function ProductFilters({ products }: { products: Product[] }) {
     [products]
   );
 
-  const filtered = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    return products.filter((p) => {
-      const inSearch =
-        !needle ||
-        [
-          p.productName,
-          p.brandName,
-          p.categoryName,
-          ...(p.skus || []),
-          ...(p.asins || []),
-          ...(p.upcs || []),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(needle);
-      const brandOk = !brand || p.brandName === brand;
-      const catOk = !category || p.categoryName === category;
-      return inSearch && brandOk && catOk;
-    });
-  }, [products, q, brand, category]);
-
   return (
     <Card className="rounded-2xl gap-0">
       <CardHeader className=" pb-0">
@@ -243,10 +175,7 @@ function ProductFilters({ products }: { products: Product[] }) {
           <Label className="mb-2">Category</Label>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="w-full">
-              <SelectValue
-                placeholder="All
-categories"
-              />
+              <SelectValue placeholder="All categories" />
             </SelectTrigger>
             <SelectContent>
               {categories.map((c) => (

@@ -1,4 +1,8 @@
-import type { Brand, Product } from "@/components/product/types";
+import type {
+  Brand,
+  Product,
+  ProductCategory,
+} from "@/components/product/types";
 import { axiosInstance } from "@/lib/axios-instance";
 import type { SKU } from "./sku.service";
 
@@ -20,7 +24,12 @@ type ProductsResponse = {
   products: Product[];
 };
 
-type BrandResponse = {
+export type CategoriesResponse = {
+  totalItems: number;
+  productCategories: ProductCategory[];
+};
+
+export type BrandsResponse = {
   totalItems: number;
   brands: Brand[];
 };
@@ -36,6 +45,16 @@ export type ProductPayload = {
   upcs: string[];
 };
 
+export type ProductResponse = {
+  id: number;
+  productName: string;
+  brand: Brand;
+  productCategory: ProductCategory;
+  productSkus: SKU[];
+  productAsins: { id: string; asin: string }[];
+  productUpcs: string[];
+};
+
 // ====================== API Calls ======================
 
 // All Products
@@ -44,13 +63,13 @@ export const getProducts = (
 ): Promise<ProductsResponse> => axiosInstance.get(`/products`, { params });
 
 // All Brands
-export const getBrands = (params: FilterParams): Promise<BrandResponse> =>
+export const getBrands = (params: FilterParams): Promise<BrandsResponse> =>
   axiosInstance.get(`/brands`, { params });
 
 // All Product Categories
 export const getProductCategories = (
   params: FilterParams
-): Promise<ProductsResponse> =>
+): Promise<CategoriesResponse> =>
   axiosInstance.get(`/product-categories`, { params });
 
 // Create Product
@@ -59,10 +78,15 @@ export const createProduct = (
 ): Promise<ProductsResponse> => axiosInstance.post(`/products`, payload);
 
 // Get Single Product
-export const getProduct = (productId: string): Promise<Product> =>
+export const getProduct = (productId: number): Promise<ProductResponse> =>
   axiosInstance.get(`/products/${productId}`);
 
 // Update Product
-export const updateProduct = (
-  payload: Partial<ProductPayload>
-): Promise<ProductsResponse> => axiosInstance.put(`/products`, payload);
+export const updateProduct = ({
+  productId,
+  payload,
+}: {
+  productId: number;
+  payload: Partial<ProductPayload>;
+}): Promise<ProductsResponse> =>
+  axiosInstance.put(`/products/${productId}`, payload);
