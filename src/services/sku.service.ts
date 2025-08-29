@@ -19,7 +19,7 @@ type SKUParams = {
   searchTerm?: string;
 };
 
-type AssignSKUPayload = {
+export type AssignSKUPayload = {
   productId: number;
   sku: string;
 };
@@ -32,7 +32,7 @@ export const createSKU = (payload: Partial<SKU>): Promise<SKUResponse> =>
 
 // Assign SKUs to Product
 export const assignSKU = (payload: AssignSKUPayload): Promise<SKUResponse> =>
-  axiosInstance.post("/skus", payload);
+  axiosInstance.post("/skus/assign-product", payload);
 
 // Get Available SKUs
 export const getAvailableSKUs = (params: SKUParams): Promise<SKUResponse> =>

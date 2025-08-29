@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useProducts } from "@/services/product-hooks";
+
 import { Filter, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -32,7 +33,7 @@ const MOCK_SKU_CATALOG: CatalogSKU[] = [
 ];
 
 export default function ProductsPage() {
-  const { data, isLoading } = useProducts();
+  const { data, isLoading, isError, error } = useProducts();
 
   // Edit modal
   const [editOpen, setEditOpen] = useState(false);
@@ -57,7 +58,16 @@ export default function ProductsPage() {
 
   const { products } = data || {};
 
-  if (!products) return null;
+  if (!products || isError)
+    return (
+      <div className="h-96  flex items-center justify-center">
+        <p className="font-medium text-muted-foreground text-lg">
+          {isError
+            ? error.message
+            : "Something went wrong while fetching products"}
+        </p>
+      </div>
+    );
 
   return (
     <div className="space-y-6">
@@ -108,7 +118,6 @@ export default function ProductsPage() {
       <AssignProductsModal
         open={assignOpen}
         onOpenChange={setAssignOpen}
-        catalog={MOCK_SKU_CATALOG}
         products={products}
         onAssign={() => {}}
         onNewFromSKU={(sku) => {

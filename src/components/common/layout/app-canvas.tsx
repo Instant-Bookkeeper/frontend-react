@@ -6,7 +6,6 @@ import {
   MOCK_BILLS,
   MOCK_PAYMENTS,
   MOCK_POS,
-  MOCK_PRODUCTS,
   MOCK_REMOVALS,
   MOCK_SHIP_ITEMS,
   MOCK_SHIPMENTS,
@@ -24,16 +23,17 @@ import type {
   ShipmentItem,
   Task,
 } from "@/components/billing/types";
-import { POCreator } from "@/components/po/po-creator";
-import type { Product } from "@/components/product/types";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getUserProfile, type UserProfile } from "@/services/user.service";
+import clsx from "clsx";
 import {
   Boxes,
+  ChevronDown,
   ClipboardList,
   DollarSign,
   PackageSearch,
@@ -41,17 +41,14 @@ import {
   SplitSquareHorizontal,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { PurchasesTab } from "../tabs/purchases-tab";
-import { PaymentsTab } from "../tabs/payments-tab";
-import { RemovalsTab } from "../tabs/removals-tab";
-import { FBATab } from "../tabs/fba-tab";
-import { AdjustmentsTab } from "../tabs/adjustments-tab";
-import { TasksTab } from "../tabs/tasks-tab";
-import { ProductsTab } from "../tabs/products-tab";
 import { Link, Outlet, useNavigate } from "react-router";
-import clsx from "clsx";
 import Header from "./header";
-import { getUserProfile, type UserProfile } from "@/services/user.service";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 type TabType =
   | "purchases"
   | "products"
@@ -151,32 +148,46 @@ export default function AppCanvas() {
           {/* Side Navigation */}
           <TooltipProvider>
             <aside className="absolute -bg-conic-0 -left-16 h-fit">
-              <nav className="flex flex-col gap-1 p-1 rounded-2xl border bg-background/50 w-14">
-                {links.map(({ key, label, icon: Icon }) => (
-                  <Tooltip key={key}>
-                    <TooltipTrigger asChild>
-                      <Link
-                        to={key}
-                        onClick={() => setTab(key as TabType)}
-                        className={clsx(
-                          `flex items-center justify-center rounded-xl p-3 transition-colors`,
-                          tab === key
-                            ? "bg-primary text-primary-foreground"
-                            : "hover:bg-muted",
-                          key !== "products"
-                            ? "pointer-events-none text-muted-foreground"
-                            : ""
-                        )}
-                        aria-label={label}
-                        title={label}
-                      >
-                        <Icon className="size-5" />
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">{label}</TooltipContent>
-                  </Tooltip>
-                ))}
-              </nav>
+              <Collapsible defaultOpen>
+                <div className="flex flex-col items-center">
+                  {/* Toggle Button */}
+
+                  {/* Collapsible Content */}
+                  <nav className="flex flex-col gap-1 p-1 rounded-2xl border bg-background/50 w-14">
+                    <CollapsibleTrigger asChild>
+                      <Button variant={"default"} className="rounded-xl group">
+                        <ChevronDown className="size-5 transition-transform group-data-[state=open]:rotate-180" />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      {links.map(({ key, label, icon: Icon }) => (
+                        <Tooltip key={key}>
+                          <TooltipTrigger asChild>
+                            <Link
+                              to={key}
+                              onClick={() => setTab(key as TabType)}
+                              className={clsx(
+                                "flex items-center justify-center rounded-xl p-3 transition-all",
+                                tab === key
+                                  ? "bg-primary text-primary-foreground"
+                                  : "hover:bg-muted",
+                                key !== "products"
+                                  ? "pointer-events-none text-muted-foreground"
+                                  : ""
+                              )}
+                              aria-label={label}
+                              title={label}
+                            >
+                              <Icon className="size-5" />
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent side="right">{label}</TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </CollapsibleContent>
+                  </nav>
+                </div>
+              </Collapsible>
             </aside>
           </TooltipProvider>
 

@@ -52,6 +52,7 @@ export const AddProduct: React.FC<{
         toast("A new Product has been added", { position: "top-right" });
         onOpenChange(false);
         queryClient.invalidateQueries({ queryKey: ["products"] });
+        queryClient.invalidateQueries({ queryKey: ["available-skus"] });
       },
     });
   };

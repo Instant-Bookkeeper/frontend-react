@@ -23,8 +23,9 @@ import type { Product } from "./types";
 export const ProductCombobox: React.FC<{
   products: Product[];
   value?: number;
+  disabled?: boolean;
   onValueChange: (value: number) => void;
-}> = ({ products, value, onValueChange }) => {
+}> = ({ products, value, disabled = false, onValueChange }) => {
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -33,6 +34,7 @@ export const ProductCombobox: React.FC<{
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          disabled={disabled}
           className="w-full justify-between"
         >
           {value
@@ -41,7 +43,7 @@ export const ProductCombobox: React.FC<{
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0">
+      <PopoverContent className="w-full p-0">
         <Command>
           <CommandInput placeholder="Search products..." />
           <CommandEmpty>No product found.</CommandEmpty>
