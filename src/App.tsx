@@ -23,7 +23,7 @@ function App() {
           <Route path="profile" element={<ProfilePage />} />
         </Route>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<Navigate to={"/login"} />} />
       </Routes>
     </QueryClientProvider>
   );

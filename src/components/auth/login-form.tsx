@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { login, type LoginPayload } from "@/services/auth.service";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { CircleX } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 export function LoginForm({
   className,
@@ -106,12 +106,12 @@ export function LoginForm({
               </Button>
             </div>
 
-            <div className="mt-4 text-center text-sm">
+            {/* <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <a href="/register" className="underline underline-offset-4">
+              <Link to="/register" className="underline underline-offset-4">
                 Sign up
-              </a>
-            </div>
+              </Link>
+            </div> */}
           </form>
         </CardContent>
       </Card>
