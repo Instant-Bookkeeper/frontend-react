@@ -19,7 +19,7 @@ export type ProductsParams = FilterParams & {
   productCategoryId?: string;
 };
 
-type ProductsResponse = {
+export type ProductsResponse = {
   totalItems: number;
   products: Product[];
 };

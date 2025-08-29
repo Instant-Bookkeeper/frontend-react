@@ -12,13 +12,22 @@ import {
   type ProductResponse,
   type ProductsParams,
 } from "./product.service";
+import { useSearchParams } from "react-router";
 
 // ---------------------------
 // Products Hook
 // ---------------------------
-export function useProducts(
-  params: ProductsParams = { pageNumber: 1, pageSize: 10 }
-) {
+export function useProducts() {
+  const [searchParams] = useSearchParams();
+
+  const params: ProductsParams = {
+    pageNumber: Number(searchParams.get("pageNumber")) || 1,
+    pageSize: Number(searchParams.get("pageSize")) || 10,
+    searchTerm: searchParams.get("searchTerm") || undefined,
+    brandId: searchParams.get("brandId") || undefined,
+    productCategoryId: searchParams.get("productCategoryId") || undefined,
+  };
+
   return useQuery({
     queryKey: ["products", params],
     queryFn: () => getProducts(params),
