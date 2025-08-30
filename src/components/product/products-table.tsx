@@ -89,6 +89,13 @@ export const ProductsTable: React.FC<{
               </TableRow>
             </TableHeader>
             <TableBody>
+              {!products.length && (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center p-10">
+                    <p className="text-lg font-semibold">No products found</p>
+                  </TableCell>
+                </TableRow>
+              )}
               {products.map((p: Product) => (
                 <TableRow key={p.id}>
                   <TableCell>{p.productName}</TableCell>
@@ -165,7 +172,9 @@ export const ProductsTable: React.FC<{
 
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Rows per page</span>
+            <span className="text-sm text-muted-foreground whitespace-nowrap">
+              Rows per page
+            </span>
             <Select
               value={String(pageSize)}
               onValueChange={(v) => {

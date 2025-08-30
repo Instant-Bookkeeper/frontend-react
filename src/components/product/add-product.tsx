@@ -19,6 +19,7 @@ import { ProductForm } from "./product-form";
 import { ProductCombobox } from "./product-search";
 import type { Product } from "./types";
 import { toast } from "sonner";
+import type { SKU } from "@/services/sku.service";
 
 const defaultValues = {
   productName: "",
@@ -37,8 +38,9 @@ export const AddProduct: React.FC<{
   open: boolean;
   onOpenChange: (v: boolean) => void;
   existingProducts: Product[];
+  presetSKU?: SKU;
   onOpenExisting?: (productId: number) => void;
-}> = ({ open, onOpenChange, existingProducts, onOpenExisting }) => {
+}> = ({ open, onOpenChange, existingProducts, onOpenExisting, presetSKU }) => {
   const { mutate, isPending } = useMutation({
     mutationKey: ["create-product"],
     mutationFn: createProduct,
@@ -76,6 +78,7 @@ export const AddProduct: React.FC<{
         </div>
         <ProductForm
           mode="add"
+          presetSKU={presetSKU}
           onSubmit={handleCreateProduct}
           defaultValues={defaultValues}
         />

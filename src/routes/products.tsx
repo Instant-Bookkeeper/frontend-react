@@ -23,6 +23,7 @@ import {
   useCategories,
   useProducts,
 } from "@/services/product-hooks";
+import type { SKU } from "@/services/sku.service";
 import { Filter, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
@@ -38,7 +39,7 @@ export default function ProductsPage() {
   };
 
   const [addOpen, setAddOpen] = useState(false);
-  const [presetSKU, setPresetSKU] = useState<string | undefined>(undefined);
+  const [presetSKU, setPresetSKU] = useState<SKU | undefined>(undefined);
 
   const [assignOpen, setAssignOpen] = useState(false);
 
@@ -111,6 +112,7 @@ export default function ProductsPage() {
         open={addOpen}
         onOpenChange={setAddOpen}
         existingProducts={data?.products || []}
+        presetSKU={presetSKU}
         onOpenExisting={(id) => {
           const p = data?.products?.find((x) => x.id === id);
           if (p) {
@@ -123,9 +125,8 @@ export default function ProductsPage() {
         open={assignOpen}
         onOpenChange={setAssignOpen}
         products={data?.products || []}
-        onAssign={() => {}}
         onNewFromSKU={(sku) => {
-          setPresetSKU(sku);
+          setPresetSKU({ sku });
           setAddOpen(true);
         }}
       />
@@ -182,6 +183,7 @@ function ProductFilters() {
         <div className="col-span-12 md:col-span-3">
           <Label className="mb-2">Brand</Label>
           <Select
+            key={`brand-${brandId || "all"}`}
             disabled={!brands.length}
             value={brandId || undefined}
             onValueChange={(v) => updateParam("brandId", v)}
@@ -201,6 +203,7 @@ function ProductFilters() {
         <div className="col-span-12 md:col-span-3">
           <Label className="mb-2">Category</Label>
           <Select
+            key={`cat-${categoryId || "all"}`}
             disabled={!categories.length}
             value={categoryId || undefined}
             onValueChange={(v) => updateParam("productCategoryId", v)}
@@ -223,7 +226,7 @@ function ProductFilters() {
             className="w-full"
             onClick={() => {
               setSearchParams({});
-              setSearchValue(""); // also reset local search state
+              setSearchValue("");
             }}
           >
             Clear
