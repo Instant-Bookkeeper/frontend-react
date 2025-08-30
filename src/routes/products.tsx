@@ -6,7 +6,6 @@
 import { AddProduct } from "@/components/product/add-product";
 import { AssignProductsModal } from "@/components/product/assign-product";
 import { ProductsTable } from "@/components/product/products-table";
-import type { CatalogSKU, Product } from "@/components/product/types";
 import { ViewEditProduct } from "@/components/product/view-product";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,90 +19,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  getBrands,
-  getProductCategories,
-  getProducts,
-} from "@/services/product.service";
-import { useQuery } from "@tanstack/react-query";
+  useBrands,
+  useCategories,
+  useProducts,
+} from "@/services/product-hooks";
 import { Filter, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
-
-const MOCK_SKU_CATALOG: CatalogSKU[] = [
-  { sku: "AK-COOLER-12L", description: "Cooler 12L – graphite" },
-  { sku: "AK-COOLER-24L", description: "Cooler 24L – graphite" },
-  { sku: "AK-MUG-STEEL", description: "Steel mug 16oz – brushed" },
-  { sku: "AK-BUNDLE-001", description: "Starter kit – cooler + mug" },
-  { sku: "AK-LID-12L", description: "Replacement lid 12L" },
-];
-
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router";
+import { useDebounce } from "use-debounce";
 export default function ProductsPage() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["products"],
-    queryFn: () => getProducts({ pageNumber: 1, pageSize: 10 }),
-  });
+  const { data, isLoading, isError, error } = useProducts();
 
-  const { data: brandsData } = useQuery({
-    queryKey: ["brands"],
-    queryFn: () => getBrands({ pageNumber: 1, pageSize: 10 }),
-  });
-
-  const { data: categoriesData } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => getProductCategories({ pageNumber: 1, pageSize: 10 }),
-  });
-
-  console.log("Products", data);
-  console.log("Brands", brandsData);
-  console.log("Categories", categoriesData);
-
-  // Filters
-
-  // Edit modal
   const [editOpen, setEditOpen] = useState(false);
-  const [editing, setEditing] = useState<Product | null>(null);
-  const openEdit = (p: Product) => {
-    setEditing(p);
+  const [productId, setProductId] = useState<number | null>(null);
+  const openEdit = (p: number) => {
+    setProductId(p);
     setEditOpen(true);
   };
-  const saveEdit = (next: Product) => {};
-  // Add product (with optional preset SKU)
+
   const [addOpen, setAddOpen] = useState(false);
   const [presetSKU, setPresetSKU] = useState<string | undefined>(undefined);
-  const createProduct = (p: Product) => {};
 
-  // Assign products
   const [assignOpen, setAssignOpen] = useState(false);
 
-  // function doAssign({
-  //   targetProduct,
-  //   selectedSKUs,
-  // }: {
-  //   targetProduct?: string;
-  //   selectedSKUs: string[];
-  // }) {
-  //   if (!selectedSKUs.length || !targetProduct) return;
-  //   setAllProducts((prev) =>
-  //     prev.map((p) =>
-  //       p.id !== targetProduct
-  //         ? p
-  //         : {
-  //             ...p,
-  //             skus: Array.from(new Set([...(p.skus || []), ...selectedSKUs])),
-  //           }
-  //     )
-  //   );
-  // }
+  const loadingCount = useRef(0);
 
-  if (isLoading)
-    return (
-      <div className="h-96  flex items-center justify-center">
-        <p className="font-medium text-muted-foreground text-2xl">Loading...</p>
-      </div>
-    );
-
-  const { products, totalItems } = data || {};
-
-  if (!products) return null;
+  useEffect(() => {
+    if (isLoading) {
+      if (loadingCount.current > 0) return;
+      loadingCount.current = 1;
+    }
+  }, [isLoading]);
 
   return (
     <div className="space-y-6">
@@ -130,35 +76,53 @@ export default function ProductsPage() {
         </div>
       </div>
       {/* Filters */}
-      <ProductFilters products={products} />
+      <ProductFilters />
       {/* Table */}
-      <ProductsTable products={products} onEdit={openEdit} />
+      {isLoading ? (
+        <div className="h-96  flex items-center justify-center">
+          <p className="font-medium text-muted-foreground text-2xl">
+            Loading...
+          </p>
+        </div>
+      ) : !data || isError ? (
+        <div className="h-96  flex items-center justify-center">
+          <p className="font-medium text-muted-foreground text-lg">
+            {isError
+              ? error.message
+              : "Something went wrong while fetching products"}
+          </p>
+        </div>
+      ) : (
+        <div className="relative">
+          <ProductsTable data={data} onEdit={openEdit} />
+          {isLoading && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center"></div>
+          )}
+        </div>
+      )}
+
       {/* Modals */}
       <ViewEditProduct
         open={editOpen}
         onOpenChange={setEditOpen}
-        product={editing}
-        onSave={saveEdit}
+        productId={productId}
       />
       <AddProduct
         open={addOpen}
         onOpenChange={setAddOpen}
-        onCreate={createProduct}
-        presetSKU={presetSKU}
-        existingProducts={products}
+        existingProducts={data?.products || []}
         onOpenExisting={(id) => {
-          const p = products.find((x) => x.id === id);
+          const p = data?.products?.find((x) => x.id === id);
           if (p) {
             setAddOpen(false);
-            openEdit(p);
+            openEdit(p.id);
           }
         }}
       />
       <AssignProductsModal
         open={assignOpen}
         onOpenChange={setAssignOpen}
-        catalog={MOCK_SKU_CATALOG}
-        products={products}
+        products={data?.products || []}
         onAssign={() => {}}
         onNewFromSKU={(sku) => {
           setPresetSKU(sku);
@@ -169,52 +133,39 @@ export default function ProductsPage() {
   );
 }
 
-function ProductFilters({ products }: { products: Product[] }) {
-  const [q, setQ] = useState("");
-  const [brand, setBrand] = useState<string | undefined>();
-  const [category, setCategory] = useState<string | undefined>();
-  const brands = useMemo(
-    () =>
-      Array.from(new Set(products.map((p) => p.brandName || ""))).filter(
-        Boolean
-      ),
-    [products]
+function ProductFilters() {
+  const { data: brandsData } = useBrands();
+  const { data: categoriesData } = useCategories();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("searchTerm") || ""
   );
 
-  const categories = useMemo(
-    () =>
-      Array.from(new Set(products.map((p) => p.categoryName || ""))).filter(
-        Boolean
-      ),
-    [products]
-  );
+  const updateParam = (key: string, value: string | undefined) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (!value) newParams.delete(key);
+    else newParams.set(key, value);
 
-  const filtered = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    return products.filter((p) => {
-      const inSearch =
-        !needle ||
-        [
-          p.productName,
-          p.brandName,
-          p.categoryName,
-          ...(p.skus || []),
-          ...(p.asins || []),
-          ...(p.upcs || []),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(needle);
-      const brandOk = !brand || p.brandName === brand;
-      const catOk = !category || p.categoryName === category;
-      return inSearch && brandOk && catOk;
-    });
-  }, [products, q, brand, category]);
+    newParams.set("pageNumber", "1");
+    setSearchParams(newParams);
+  };
+
+  const [debouncedSearch] = useDebounce(searchValue, 500);
+
+  useEffect(() => {
+    updateParam("searchTerm", debouncedSearch || undefined);
+  }, [debouncedSearch]);
+
+  const brandId = searchParams.get("brandId") || "";
+  const categoryId = searchParams.get("productCategoryId") || "";
+
+  const brands = brandsData?.brands ?? [];
+  const categories = categoriesData?.productCategories ?? [];
 
   return (
     <Card className="rounded-2xl gap-0">
-      <CardHeader className=" pb-0">
+      <CardHeader className="pb-0">
         <CardTitle className="text-base flex items-center gap-2">
           <Filter className="size-4" /> Filters
         </CardTitle>
@@ -224,20 +175,24 @@ function ProductFilters({ products }: { products: Product[] }) {
           <Label className="mb-2">Search</Label>
           <Input
             placeholder="Search name, SKU, ASIN, UPC, brand, category"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
         </div>
         <div className="col-span-12 md:col-span-3">
           <Label className="mb-2">Brand</Label>
-          <Select value={brand} onValueChange={setBrand}>
+          <Select
+            disabled={!brands.length}
+            value={brandId || undefined}
+            onValueChange={(v) => updateParam("brandId", v)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="All brands" />
             </SelectTrigger>
             <SelectContent>
               {brands.map((b) => (
-                <SelectItem key={b} value={b}>
-                  {b}
+                <SelectItem key={b.id} value={String(b.id)}>
+                  {b.brandName}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -245,17 +200,18 @@ function ProductFilters({ products }: { products: Product[] }) {
         </div>
         <div className="col-span-12 md:col-span-3">
           <Label className="mb-2">Category</Label>
-          <Select value={category} onValueChange={setCategory}>
+          <Select
+            disabled={!categories.length}
+            value={categoryId || undefined}
+            onValueChange={(v) => updateParam("productCategoryId", v)}
+          >
             <SelectTrigger className="w-full">
-              <SelectValue
-                placeholder="All
-categories"
-              />
+              <SelectValue placeholder="All categories" />
             </SelectTrigger>
             <SelectContent>
               {categories.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
+                <SelectItem key={c.id} value={String(c.id)}>
+                  {c.categoryName}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -266,9 +222,8 @@ categories"
             variant="secondary"
             className="w-full"
             onClick={() => {
-              setQ("");
-              setBrand(undefined);
-              setCategory(undefined);
+              setSearchParams({});
+              setSearchValue(""); // also reset local search state
             }}
           >
             Clear

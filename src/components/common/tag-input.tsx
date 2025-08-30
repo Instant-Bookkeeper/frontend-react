@@ -23,7 +23,7 @@ export const TagInput: React.FC<{
     }
   }
   return (
-    <div className="flex items-center flex-wrap gap-2 rounded-xl border p-2">
+    <div className="flex items-center flex-wrap gap-2 rounded-md border px-2 py-1 focus-within:border-ring ring-ring/50 focus-within:ring-[3px] transition-[color,box-shadow]">
       {value.map((t) => (
         <Badge key={t} variant="secondary" className="flex items-center gap-2">
           {t}
@@ -39,7 +39,7 @@ hover:opacity-100"
         </Badge>
       ))}
       <Input
-        className="border-0 shadow-none focus-visible:ring-0 p-0 h-7 w-40"
+        className="border-0 shadow-none focus-visible:ring-0 p-0 h-7 w-full"
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={onKeyDown}

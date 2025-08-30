@@ -10,44 +10,87 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { useState } from "react";
-import type { Product } from "./types";
+import { useProduct } from "@/services/product-hooks";
+import { updateProduct, type ProductPayload } from "@/services/product.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React from "react";
+import { toast } from "sonner";
 import { ProductForm } from "./product-form";
 
 export const ViewEditProduct: React.FC<{
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  product: Product | null;
-  onSave: (p: Product) => void;
-}> = ({ open, onOpenChange, product, onSave }) => {
-  const [draft, setDraft] = useState<Product | null>(product);
-  React.useEffect(() => {
-    setDraft(product);
-  }, [product]);
-  if (!draft) return null;
+  productId: number | null;
+}> = ({ open, onOpenChange, productId }) => {
+  const {
+    data: product,
+    isLoading,
+    isError,
+    error,
+  } = useProduct(productId as number);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: updateProduct,
+    mutationKey: ["update-product", productId],
+  });
+
+  const queryClient = useQueryClient();
+
+  const handleProductUpdate = (payload: ProductPayload) => {
+    mutate(
+      { productId: productId as number, payload },
+      {
+        onSuccess: () => {
+          toast("Product updated Successfully");
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+          onOpenChange(false);
+        },
+      }
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Edit Product</DialogTitle>
         </DialogHeader>
-        <ProductForm
-          mode="edit"
-          draft={draft}
-          disableName
-          onChange={(p) => setDraft(p)}
-        />
+        {isLoading ? (
+          <div className=" flex items-center justify-center h-[300px]">
+            <p className="text-muted-foreground text-2xl font-semibold animate-pulse">
+              Loading...
+            </p>
+          </div>
+        ) : !product ? (
+          <div className=" flex items-center justify-center h-[300px]">
+            {isError ? (
+              <p>{error.message}</p>
+            ) : (
+              "Something went wrong while fetching the product"
+            )}
+          </div>
+        ) : (
+          <ProductForm
+            mode="edit"
+            defaultValues={{
+              productName: product.productName,
+              skus: product.productSkus,
+              asins: product.productAsins.map((asin) => asin.asin),
+              upcs: product.productUpcs,
+              brandId: product.brand?.id,
+              brandName: product.brand?.brandName,
+              productCategoryId: product.productCategory?.id,
+              productCategoryName: product.productCategory?.categoryName,
+            }}
+            onSubmit={handleProductUpdate}
+          />
+        )}
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={() => {
-              if (draft) onSave(draft);
-              onOpenChange(false);
-            }}
-          >
-            Save
+          <Button form="productForm" disabled={isPending}>
+            {isPending ? "Saving..." : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

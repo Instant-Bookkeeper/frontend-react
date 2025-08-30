@@ -54,7 +54,7 @@ export default function Header({ user }: { user: UserProfile }) {
             <DropdownMenuLabel>{name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to={"/profile"}>Profile</Link>
+              <Link to={"profile"}>Profile</Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleLogout}

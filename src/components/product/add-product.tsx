@@ -12,46 +12,54 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
-import type { Product } from "./types";
-import { uid } from "@/lib/utils";
-import { ProductCombobox } from "./product-search";
+import { createProduct, type ProductPayload } from "@/services/product.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React from "react";
 import { ProductForm } from "./product-form";
+import { ProductCombobox } from "./product-search";
+import type { Product } from "./types";
+import { toast } from "sonner";
+
+const defaultValues = {
+  productName: "",
+  brandId: 0,
+  brandName: "",
+  productCategoryId: 0,
+  productCategoryName: "",
+  asins: [],
+  skus: [],
+  upcs: [],
+  totalSold: 0,
+  totalProfit: 0,
+};
 
 export const AddProduct: React.FC<{
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  onCreate: (p: Product) => void;
-  presetSKU?: string;
   existingProducts: Product[];
-  onOpenExisting?: (product_id: string) => void;
-}> = ({
-  open,
-  onOpenChange,
-  onCreate,
-  presetSKU,
-  existingProducts,
-  onOpenExisting,
-}) => {
-  const [draft, setDraft] = useState<Product>({
-    id: uid("P"),
-    productName: "",
-
-    brandName: "",
-    categoryName: "",
-    skus: [],
-    asins: [],
-    upcs: [],
-    totalSold: 0,
-    totalProfit: 0,
+  onOpenExisting?: (productId: number) => void;
+}> = ({ open, onOpenChange, existingProducts, onOpenExisting }) => {
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["create-product"],
+    mutationFn: createProduct,
   });
-  React.useEffect(() => {
-    if (open) setDraft((d) => ({ ...d, skus: presetSKU ? [presetSKU] : [] }));
-  }, [open, presetSKU]);
-  const canSave = draft.productName.trim().length > 0;
+
+  const queryClient = useQueryClient();
+
+  const handleCreateProduct = (payload: ProductPayload) => {
+    mutate(payload, {
+      onSuccess: () => {
+        toast("A new Product has been added", { position: "top-right" });
+        onOpenChange(false);
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+        queryClient.invalidateQueries({ queryKey: ["available-skus"] });
+      },
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent aria-describedby="Add Product Form" className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>New Product</DialogTitle>
         </DialogHeader>
@@ -66,18 +74,16 @@ export const AddProduct: React.FC<{
             />
           </div>
         </div>
-        <ProductForm mode="add" draft={draft} onChange={setDraft} />
+        <ProductForm
+          mode="add"
+          onSubmit={handleCreateProduct}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            disabled={!canSave}
-            onClick={() => {
-              onCreate(draft);
-              onOpenChange(false);
-            }}
-          >
+          <Button form="productForm" disabled={isPending}>
             Create
           </Button>
         </DialogFooter>

@@ -6,6 +6,7 @@ import ProductsPage from "./routes/products";
 import Register from "./routes/register";
 import ProfilePage from "./routes/profile";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "./components/ui/sonner";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } },
@@ -14,6 +15,7 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster position="top-right" />
       <Routes>
         <Route index element={<Navigate to={"/app/products"} replace />} />
         <Route path="/app" element={<Home />}>
@@ -21,7 +23,7 @@ function App() {
           <Route path="profile" element={<ProfilePage />} />
         </Route>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<Navigate to={"/login"} />} />
       </Routes>
     </QueryClientProvider>
   );

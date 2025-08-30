@@ -22,30 +22,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAvailableSKUs } from "@/services/sku-hooks";
+import {
+  assignSKU,
+  type AssignSKUPayload,
+  type SKU,
+  type SKUResponse,
+} from "@/services/sku.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
-import type { CatalogSKU, Product } from "./types";
+import { toast } from "sonner";
+import { CreateSKUFormPopover } from "./create-sku-popover";
 import { ProductCombobox } from "./product-search";
+import type { Product } from "./types";
 
 export const AssignProductsModal: React.FC<{
   open: boolean;
-  onOpenChange: (v: boolean) => void;
-  catalog: CatalogSKU[];
   products: Product[];
+  onOpenChange: (v: boolean) => void;
   onAssign: (opts: {
     targetProduct?: string;
     newProductName?: string;
     selectedSKUs: string[];
   }) => void;
   onNewFromSKU: (sku: string) => void;
-}> = ({ open, onOpenChange, catalog, products, onAssign, onNewFromSKU }) => {
-  const [selectedTarget, setSelectedTarget] = useState<
-    Record<string, string | undefined>
-  >({});
-  function assignRow(sku: string) {
-    const target = selectedTarget[sku];
-    if (!target) return; // assign requires selecting a target product
-    onAssign({ targetProduct: target, selectedSKUs: [sku] });
-  }
+}> = ({ open, products, onOpenChange, onAssign, onNewFromSKU }) => {
+  const { data: skusData, isLoading, isError, error } = useAvailableSKUs();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* CHANGED: width to max-w-4xl for consistency */}
@@ -53,62 +56,42 @@ export const AssignProductsModal: React.FC<{
         <DialogHeader>
           <DialogTitle>Unassigned SKUs</DialogTitle>
         </DialogHeader>
-        <Card className="rounded-2xl">
+        <Card className="rounded-2xl gap-0">
           <CardHeader className="p-4 pb-0">
-            <CardTitle className="text-base">Map SKUs to products</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Map SKUs to products</CardTitle>
+              <CreateSKUFormPopover
+                trigger={<Button variant={"link"}>Create New SKU</Button>}
+              />
+            </div>
           </CardHeader>
-          <CardContent className="p-0">
-            <ScrollArea className="max-h-[50vh]">
-              <Table className="table-fixed w-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">SKU</TableHead>
-                    <TableHead className="min-w-[300px]">Description</TableHead>
-                    <TableHead className="w-[250px]">
-                      Assign to Product
-                    </TableHead>
-                    <TableHead className="w-[240px] text-right">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {catalog.map((row) => (
-                    <TableRow key={row.sku}>
-                      <TableCell className="font-medium whitespace-nowrap">
-                        {row.sku}
-                      </TableCell>
-                      <TableCell className="truncate">
-                        {row.description || "—"}
-                      </TableCell>
-                      <TableCell>
-                        <ProductCombobox
-                          products={products}
-                          value={selectedTarget[row.sku]}
-                          onValueChange={(v) =>
-                            setSelectedTarget((s) => ({ ...s, [row.sku]: v }))
-                          }
-                        />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => onNewFromSKU(row.sku)}
-                          >
-                            New Product
-                          </Button>
-                          <Button size="sm" onClick={() => assignRow(row.sku)}>
-                            Assign
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
+          <CardContent className="px-4">
+            {isLoading ? (
+              <div className=" flex items-center justify-center h-[300px]">
+                <p className="text-muted-foreground text-2xl font-semibold animate-pulse">
+                  Loading...
+                </p>
+              </div>
+            ) : !skusData ? (
+              <div className=" flex items-center justify-center h-[300px]">
+                {isError ? (
+                  <p>{error.message}</p>
+                ) : (
+                  "Something went wrong while fetching the product"
+                )}
+              </div>
+            ) : !skusData?.availableSkus.length ? (
+              <div className="flex items-center justify-between h-[300px]">
+                <div className="text-center mx-auto">
+                  <p className="text-lg">No SKUs found.</p>
+                  <CreateSKUFormPopover
+                    trigger={<Button size="sm">+ Create new SKU</Button>}
+                  />
+                </div>
+              </div>
+            ) : (
+              <SKUsTable skusData={skusData} products={products} />
+            )}
           </CardContent>
         </Card>
         <DialogFooter>
@@ -120,3 +103,111 @@ export const AssignProductsModal: React.FC<{
     </Dialog>
   );
 };
+
+function SKUsTable({
+  skusData,
+  products,
+}: {
+  skusData: SKUResponse;
+  products: Product[] | undefined;
+}) {
+  const { mutate } = useMutation({
+    mutationKey: ["assign-sku"],
+    mutationFn: assignSKU,
+  });
+  const queryClient = useQueryClient();
+  const [assigningSku, setAssigningSku] = useState<string | null>(null);
+
+  const handleAssignSKU = (payload: AssignSKUPayload) => {
+    setAssigningSku(payload.sku);
+    mutate(payload, {
+      onSuccess: () => {
+        toast("SKU Assigned to Product");
+        queryClient.invalidateQueries({ queryKey: ["available-skus"] });
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      },
+      onSettled: () => {
+        setAssigningSku(null);
+      },
+    });
+  };
+
+  const { availableSkus } = skusData;
+  return (
+    <ScrollArea className="max-h-[50vh] border border-border rounded-xl">
+      <Table className="table-fixed w-full">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[200px]">SKU</TableHead>
+            <TableHead className="min-w-[300px]">Description</TableHead>
+            <TableHead className="w-[250px]">Assign to Product</TableHead>
+            <TableHead className="w-[240px] text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {availableSkus.map((row) => (
+            <SKURow
+              key={row.sku}
+              row={row}
+              products={products}
+              onAssign={handleAssignSKU}
+              isAssigning={assigningSku === row.sku}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </ScrollArea>
+  );
+}
+
+function SKURow({
+  row,
+  products,
+  onAssign,
+  isAssigning,
+}: {
+  row: SKU;
+  products: Product[] | undefined;
+  onAssign: (payload: AssignSKUPayload) => void;
+  isAssigning: boolean;
+}) {
+  const [productId, setProductId] = useState<number | undefined>();
+
+  const createAssignPayload = () => {
+    if (!productId) return;
+    const payload = { productId, sku: row.sku };
+    onAssign(payload);
+  };
+  return (
+    <TableRow key={row.sku}>
+      <TableCell className="font-medium whitespace-nowrap">{row.sku}</TableCell>
+      <TableCell className="truncate">{row.description || "—"}</TableCell>
+      <TableCell>
+        <ProductCombobox
+          disabled={!products}
+          products={products || []}
+          value={productId as number}
+          onValueChange={setProductId}
+        />
+      </TableCell>
+      <TableCell className="text-right">
+        <div className="flex justify-end gap-2">
+          <Button
+            size="sm"
+            variant="secondary"
+            // onClick={() => onNewFromSKU(row.sku)}
+          >
+            New Product
+          </Button>
+          <Button
+            size="sm"
+            disabled={!productId || isAssigning}
+            onClick={createAssignPayload}
+          >
+            {isAssigning ? "Assigning..." : "Assign"}
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}

@@ -24,7 +24,7 @@ export const ProductPicker: React.FC<{
   onChange: (v: { product_id?: string; sku?: string }) => void;
   allowCreate?: boolean;
 }> = ({ products, value, onChange, allowCreate }) => {
-  const selected = products.find((p) => p.id === value?.product_id);
+  const selected = products.find((p) => String(p.id) === value?.product_id);
   const [openCreate, setOpenCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newSku, setNewSku] = useState("");
@@ -46,7 +46,7 @@ export const ProductPicker: React.FC<{
           </SelectTrigger>
           <SelectContent>
             {products.map((p) => (
-              <SelectItem key={p.id} value={p.id}>
+              <SelectItem key={p.id} value={`${p.id}`}>
                 {p.productName}
               </SelectItem>
             ))}
