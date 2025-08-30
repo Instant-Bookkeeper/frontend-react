@@ -23,14 +23,16 @@ import { SKUInput } from "./sku-input";
 import { productSchema } from "./validation";
 import { CreateSKUFormPopover } from "./create-sku-popover";
 import { Button } from "../ui/button";
+import type { SKU } from "@/services/sku.service";
 
 export type DefaultValues = ProductPayload; // May extend in future
 
 export const ProductForm: React.FC<{
   mode: "add" | "edit";
   defaultValues?: DefaultValues;
+  presetSKU?: SKU;
   onSubmit: (payload: ProductPayload) => void;
-}> = ({ mode, defaultValues, onSubmit }) => {
+}> = ({ mode, defaultValues, presetSKU, onSubmit }) => {
   const { data: brandsData } = useBrands();
 
   const { data: categoriesData } = useCategories();
@@ -44,7 +46,10 @@ export const ProductForm: React.FC<{
     formState: { errors },
   } = useForm<ProductPayload>({
     resolver: yupResolver(productSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      skus: presetSKU ? [presetSKU] : defaultValues?.skus,
+    },
   });
 
   const { productCategories } = categoriesData || {};

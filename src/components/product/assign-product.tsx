@@ -40,13 +40,8 @@ export const AssignProductsModal: React.FC<{
   open: boolean;
   products: Product[];
   onOpenChange: (v: boolean) => void;
-  onAssign: (opts: {
-    targetProduct?: string;
-    newProductName?: string;
-    selectedSKUs: string[];
-  }) => void;
   onNewFromSKU: (sku: string) => void;
-}> = ({ open, products, onOpenChange, onAssign, onNewFromSKU }) => {
+}> = ({ open, products, onOpenChange, onNewFromSKU }) => {
   const { data: skusData, isLoading, isError, error } = useAvailableSKUs();
 
   return (
@@ -90,10 +85,15 @@ export const AssignProductsModal: React.FC<{
                 </div>
               </div>
             ) : (
-              <SKUsTable skusData={skusData} products={products} />
+              <SKUsTable
+                skusData={skusData}
+                products={products}
+                onNewFromSKU={onNewFromSKU}
+              />
             )}
           </CardContent>
         </Card>
+
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Close
@@ -107,8 +107,10 @@ export const AssignProductsModal: React.FC<{
 function SKUsTable({
   skusData,
   products,
+  onNewFromSKU,
 }: {
   skusData: SKUResponse;
+  onNewFromSKU: (sku: string) => void;
   products: Product[] | undefined;
 }) {
   const { mutate } = useMutation({
@@ -151,6 +153,7 @@ function SKUsTable({
               row={row}
               products={products}
               onAssign={handleAssignSKU}
+              onNewFromSKU={onNewFromSKU}
               isAssigning={assigningSku === row.sku}
             />
           ))}
@@ -165,11 +168,13 @@ function SKURow({
   products,
   onAssign,
   isAssigning,
+  onNewFromSKU,
 }: {
   row: SKU;
   products: Product[] | undefined;
   onAssign: (payload: AssignSKUPayload) => void;
   isAssigning: boolean;
+  onNewFromSKU: (sku: string) => void;
 }) {
   const [productId, setProductId] = useState<number | undefined>();
 
@@ -195,7 +200,7 @@ function SKURow({
           <Button
             size="sm"
             variant="secondary"
-            // onClick={() => onNewFromSKU(row.sku)}
+            onClick={() => onNewFromSKU(row.sku)}
           >
             New Product
           </Button>
